@@ -96,4 +96,96 @@ barplot.spines['bottom'].set_visible(False)
 plt.show()
 
 ```
+<img src="https://raw.githubusercontent.com/Markus-DS-29/Data-Cleaning-and-Storytelling/main/Revenue%20by%20Category.png" alt="Revenue by Category" style="width: 616px; height: auto;">
 
+### Creating Categories
+
+```
+#show revenue and discount_perc in one plot
+
+# Category: Memory
+# Resample data
+
+memory_mean = grouped_categories_disc_perc.resample('W', on='date')['memory'].mean()
+memory_revenue = grouped_categories_rev.resample('W', on='date')['memory'].sum()
+
+# Plotting
+fig, ax1 = plt.subplots(figsize=(10, 4))
+
+# Plot the revenue with the primary y-axis
+ax1.plot(memory_revenue, color='b', label='Revenue')
+ax1.set_ylabel('Revenue', color='b')
+ax1.tick_params(axis='y', labelcolor='b')
+ax1.set_ylim(0, 100000)  # Set the y-axis limit for revenue
+
+# Create a second y-axis for the discount percentage
+ax2 = ax1.twinx()
+ax2.plot(memory_mean, color='r', label='Discount Percentage (Mean)')
+ax2.set_xlabel('Date')
+ax2.set_ylabel('Discount Percentage (Mean)', color='r')
+ax2.tick_params(axis='y', labelcolor='r')
+ax2.set_ylim(0, 0.4)
+
+# Adding a title and a grid
+plt.title('Memory Sales (32% of total revenues): Weekly Revenue and Discount Percentage (Mean)')
+#ax1.grid()
+
+# Adding legends
+ax1_legend = ax1.legend(loc='upper left', bbox_to_anchor=(0.05, 1))
+ax2_legend = ax2.legend(loc='upper left', bbox_to_anchor=(0.05, 0.9))
+
+# Show the plot
+plt.show()
+
+```
+<img src="https://raw.githubusercontent.com/Markus-DS-29/Data-Cleaning-and-Storytelling/main/Weekly%20Revenue%20and%20Discount%20Percentage.png" alt="Weekly Revenue and Discount Percentage (Mean)" style="width: 892px; height: auto;">
+
+
+## Implementing Trendlines
+
+```
+# Plot discounts percentage of major categories over time
+grouped_categories_disc_perc = analysis_categories_df.groupby(['date', 'category'])['discount_perc'].mean().unstack()
+
+# Reset index to have 'date' as a column
+grouped_categories_disc_perc = grouped_categories_disc_perc.reset_index()
+
+# Resample the data to weekly frequency
+resampled_disc_perc = grouped_categories_disc_perc.resample('W', on='date')[category_list].mean()
+
+# Apply a rolling mean to smooth the data (e.g., using a 4-week window)
+smoothed_disc_perc = resampled_disc_perc.rolling(window=4, min_periods=1).mean()
+
+# Filter the data to start from May 2017
+filtered_disc_perc = smoothed_disc_perc[smoothed_disc_perc.index >= '2017-05-01']
+
+# Plot the filtered and smoothed data
+fig, ax = plt.subplots(figsize=(10, 4))
+
+for category in category_list:
+    ax.plot(filtered_disc_perc.index, filtered_disc_perc[category], color='lightgray')  # Plot without labels
+
+    # Fit a linear regression model to the category data
+    x_values = np.arange(len(filtered_disc_perc[category].dropna()))
+    y_values = filtered_disc_perc[category].dropna()
+    slope, intercept = np.polyfit(x_values, y_values, 1)
+
+    # Plot the trendline for the category
+    trendline = slope * x_values + intercept
+    ax.plot(filtered_disc_perc[category].dropna().index, trendline, linestyle='--', label=f'{category} Trendline')
+
+# Set plot title and labels
+plt.title('Discount Percentage of Major Categories Over Time')
+plt.xlabel('Date')
+plt.ylabel('Discount Percentage')
+
+# Show the legend for trendlines in the top left position
+plt.legend(loc='upper left')
+
+# Add a grid
+ax.grid(True)
+
+plt.show()
+```
+
+<img src="https://raw.githubusercontent.com/Markus-DS-29/Data-Cleaning-and-Storytelling/main/Discount%20Percentage%20of%20Major%20Categories%20Over%20Time.png" alt="Discount Percentage of Major Categories Over Time" style="width: 892px; height: auto;">
