@@ -98,7 +98,7 @@ plt.show()
 ```
 <img src="https://raw.githubusercontent.com/Markus-DS-29/Data-Cleaning-and-Storytelling/main/Revenue%20by%20Category.png" alt="Revenue by Category" style="width: 616px; height: auto;">
 
-### Creating Categories
+### Analyse Revenues
 
 ```
 #show revenue and discount_perc in one plot
@@ -141,7 +141,7 @@ plt.show()
 <img src="https://raw.githubusercontent.com/Markus-DS-29/Data-Cleaning-and-Storytelling/main/Weekly%20Revenue%20and%20Discount%20Percentage.png" alt="Weekly Revenue and Discount Percentage (Mean)" style="width: 892px; height: auto;">
 
 
-## Implementing Trendlines
+## Analyse Discounts
 
 ```
 # Plot discounts percentage of major categories over time
